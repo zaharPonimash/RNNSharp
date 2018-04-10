@@ -1,34 +1,37 @@
 # RNNSharp
-RNNSharp is a toolkit of deep recurrent neural network which is widely used for many different kinds of tasks, such as sequence labeling, sequence-to-sequence and so on. It's written by C# language and based on .NET framework 4.6 or above version.
+RNNSharp - это инструментарий глубокой рекуррентной нейронной сети, который широко используется для множества различных задач, таких как маркировка последовательности, seq2seq и так далее. Он написан на языке C# и основан на .NET framework 4.6 или выше.
 
-This page introduces what is RNNSharp, how it works and how to use it. To get the demo package, you can access release page.
+На этой странице представлено, что такое RNNSharp, как он работает и как его использовать. Чтобы получить демонстрационный пакет, вы можете обратиться к странице выпуска
 
 ## Overview
-RNNSharp supports many different types of deep recurrent neural network (aka DeepRNN) structures.  
+RNNSharp поддерживает множество различных типов структур глубокой рекуррентной нейронной сети (aka DeepRNN).
 
-For network structure, it supports forward RNN and bi-directional RNN. Forward RNN considers histrocial information before current token, however, bi-directional RNN considers both histrocial information and information in future.  
+Для структуры сети он поддерживает прямой RNN и двунаправленный RNN. Вперед RNN рассматривает историческую информацию до текущего токена, однако двунаправленный RNN рассматривает как информацию о предыстории, так и информацию в будущем.
 
-For hidden layer structure, it supports LSTM and Dropout. Compared to BPTT, LSTM is very good at keeping long term memory, since it has some gates to contorl information flow. Dropout is used to add noise during training in order to avoid overfitting.  
+Для скрытой структуры слоев он поддерживает LSTM и Dropout. По сравнению с BPTT, LSTM очень хорош в сохранении долговременной памяти, так как у нее есть некоторые ворота для потоковой передачи информации. Выпадение используется для добавления шума во время обучения, чтобы избежать переобучения.
 
-In terms of output layer structure, simple, softmax,  sampled softmax and recurrent CRFs[1] are supported. Softmax is the tranditional type which is widely used in many kinds of tasks. Sampled softmax is especially used for the tasks with large output vocabulary, such as sequence generation tasks (sequence-to-sequence model). Simple type is usually used with recurrent CRF together. For recurrent CRF, based on simple outputs and tags transition, it computes CRF output for entire sequence. For sequence labeling tasks in offline, such as word segmentation, named entity recognition and so on, recurrent CRF has better performance than softmax, sampled softmax and linear CRF.  
+С точки зрения структуры выходного уровня поддерживаются простые, softmax, выборочные softmax и повторяющиеся CRF [1]. Softmax - это тип tranditional, который широко используется во многих видах задач. Сэмплированный softmax особенно используется для задач с большим выходным лексиконом, таких как задачи генерации последовательности (модель последовательности к последовательности). Простой тип обычно используется с повторяющимся CRF вместе. Для повторного CRF, основанного на простых переходах выходов и тегов, он вычисляет вывод CRF для всей последовательности. Для задач маркировки последовательностей в автономном режиме, таких как сегментация слов, распознавание имен объектов и т. Д., Рекуррентный CRF имеет лучшую производительность, чем softmax, дискретный softmax и линейный CRF.  
 
-Here is an example of deep bi-directional RNN-CRF network. It contains 3 hidden layers, 1 native RNN output layer and 1 CRF output layer.  
+
+Вот пример глубокой двунаправленной сети RNN-CRF. Он содержит 3 скрытых слоя, 1 собственный RNN-выход и 1 CRF-выход.
 ![](https://github.com/zhongkaifu/RNNSharp/blob/master/RNNSharpOverview.jpg)
 
-Here is the inner structure of one bi-directional hidden layer.  
+
+Вот внутренняя структура одного двунаправленного скрытого слоя.  
 ![](https://github.com/zhongkaifu/RNNSharp/blob/master/RNNSharpLayer.jpg)
 
-Here is the neural network for sequence-to-sequence task. "TokenN" are from source sequence, and "ELayerX-Y" are auto-encoder's hidden layers. Auto-encoder is defined in feature configuration file. &lt;s&gt; is always the beginning of target sentence, and "DLayerX-Y" means the decoder's hidden layers. In decoder, it generates one token at one time until &lt;/s&gt; is generated.  
+Вот нейронная сеть для задачи seq2seq. «TokenN» - из исходной последовательности, а «ELayerX-Y» - скрытые слои автокодера. Автокодер определяется в файле конфигурации функции. & Lt; & s GT; всегда является началом целевого предложения, а «DLayerX-Y» означает скрытые слои декодера. В декодере он генерирует один токен за один раз, пока &lt;/s&gt; генерируется.  
 ![](https://github.com/zhongkaifu/RNNSharp/blob/master/RNNSharpSeq2Seq.jpg)
 
 ## Supported Feature Types
-RNNSharp supports many different feature types, so the following paragraph will introduce how these feaures work.  
+
+RNNSharp поддерживает множество различных типов объектов, поэтому в следующем параграфе будет показано, как работают эти функции. 
 
 ## Template Features
 
-Template features are generated by templates. By given templates and corpus, these features can be automatically generated. In RNNSharp, template features are sparse features, so if the feature exists in current token, the feature value will be 1 (or feature frequency), otherwise, it will be 0. It's similar as CRFSharp features. In RNNSharp, TFeatureBin.exe is the console tool to generate this type of features.
+Шаблонные функции создаются с помощью шаблонов. Благодаря заданным шаблонам и корпусу эти функции могут автоматически генерироваться. В RNNSharp функции шаблона - редкие функции, поэтому, если функция существует в текущем токене, значение функции будет равно 1 (или частоте функции), в противном случае это будет 0. Это похоже на функции CRFSharp. В RNNSharp TFeatureBin.exe является консольным инструментом для создания этого типа функций.
 
-In template file, each line describes one template which consists of prefix, id and rule-string. The prefix indicates template type. So far, RNNSharp supports U-type feature, so the prefix is always as "U". Id is used to distinguish different templates. And rule-string is the feature body.
+В файле шаблона каждая строка описывает один шаблон, который состоит из префикса, id и строки правил. Префикс указывает тип шаблона. Пока что RNNSharp поддерживает функцию U-типа, поэтому префикс всегда равен «U». Идентификатор используется для различения разных шаблонов. Правило-строка - это тело объекта.
 
 \# Unigram  
 U01:%x[-1,0]  
@@ -47,7 +50,8 @@ U13:C%x[-1,0]/%x[-1,1]
 U14:C%x[0,0]/%x[0,1]  
 U15:C%x[1,0]/%x[1,1]  
 
-The rule-string has two types, one is constant string, and the other is variable. The simplest variable format is {“%x[row,col]”}. Row specifies the offset between current focusing token and generate feature token in row. Col specifies the absolute column position in corpus. Moreover, variable combination is also supported, for example: {“%x[row1, col1]/%x[row2, col2]”}. When we build feature set, variable will be expanded to specific string. Here is an example in training data for named entity task.  
+
+Строка правил имеет два типа: одна - постоянная строка, а другая - переменная. Простейший переменный формат {“%x[row,col]”}. Строка определяет смещение между текущим токеном фокусировки и генерирует токен функции в строке. Col указывает абсолютную позицию столбца в корпусе. Более того, переменная комбинация также поддерживается, например: {“%x[row1, col1]/%x[row2, col2]”}. Когда мы создадим набор функций, переменная будет расширена до определенной строки. Ниже приведен пример обучения данных для задачи с именем entity. 
 
 Word       | Pos  | Tag
 -----------|------|----
@@ -73,7 +77,7 @@ of         | IN   | M_ORGANIZATION
 Texas      | NNP  | M_ORGANIZATION
 Austin     | NNP  | E_ORGANIZATION
 
-According above templates, assuming current focusing token is “York NNP E_LOCATION”, below features are generated:  
+Согласно вышеприведенным шаблонам, если текущий токен фокусировки - «York NNP E_LOCATION», ниже генерируются функции:  
 
 U01:New  
 U02:York  
@@ -91,31 +95,31 @@ U13:CNew/NNP
 U14:CYork/NNP  
 U15:Care/VBP  
 
-Although U07 and U08, U11 and U12’s rule-string are the same, we can still distinguish them by id string.
+Хотя строки правил U07 и U08, U11 и U12 одинаковы, мы все равно можем различать их по строке id.
 
 ## Context Template Features
 
-Context template features are based on template features and combined with context. In this example, if the context setting is "-1,0,1", the feature will combine the features of current token with its previous token and next token. For instance, if the sentence is "how are you". the generated feature set will be {Feature("how"), Feature("are"), Feature("you")}.
+Функции контекстного шаблона основаны на шаблонных функциях и объединены с контекстом. В этом примере, если параметр контекста равен «-1,0,1», эта функция объединит функции текущего токена с его предыдущим токеном и следующим токеном. Например, если предложение «как вы». сгенерированный набор функций будет {Feature ("how"), Feature ("are"), Feature ("you")}.
 
 ## Pretrained Features
 
-RNNSharp supports two types of pretrained features. The one is embedding features, and the other is auto-encoder features. Both of them are able to present a given token by a fixd-length vector. This feature is dense feature in RNNSharp.  
+RNNSharp поддерживает два типа предварительно обработанных функций. Один из них - встроенные функции, а другой - функции автоматического кодирования. Оба они могут представить данный токен вектором фиксированной длины. Эта функция является плотной функцией в RNNSharp.
 
-For embedding features, they are trained from unlabled corpus by Text2Vec project. And RNNSharp uses them as static features for each given token. However, for auto-encoder features, they are trained by RNNSharp as well, and then they can be used as dense features for other trainings. Note that, the token's granularity in pretrained features should be consistent with training corpus in main training, otherwise, some tokens will mis-match with pretrained feature.  
+Для внедрения функций они обучаются из несвязанного корпуса проектом Text2Vec. И RNNSharp использует их как статические функции для каждого заданного токена. Однако для функций автоматического кодирования они также обучаются RNNSharp, а затем они могут использоваться как плотные функции для других тренировок. Обратите внимание, что гранулярность маркера в предварительно обработанных элементах должна соответствовать учебному корпусу в основном обучении, в противном случае некоторые жетоны будут неправильно совпадать с предварительной процедурой.
 
-Likes template features, embedding feature also supports context feature. It can combine all features of given contexts into a single embedding feature. For auto-encoder features, it does not support it yet.
+Любит шаблоны, функция встраивания также поддерживает функцию контекста. Он может объединить все функции заданных контекстов в единую функцию внедрения. Для функций автоматического кодирования он пока не поддерживается.
 
 ## Run Time Features
 
-Compared with other features generated offline, this feature is generated in run time. It uses the result of previous tokens as run time feature for current token. This feature is only available for forward-RNN, bi-directional RNN does not support it.
+По сравнению с другими функциями, созданными в автономном режиме, эта функция генерируется во время выполнения. Он использует результат предыдущих токенов в качестве функции времени выполнения для текущего токена. Эта функция доступна только для прямого RNN, двунаправленная RNN не поддерживает ее.
 
 ## Source Sequence Encoding Feature
 
-This feature is only for sequence-to-sequence task. In sequence-to-sequence task, RNNSharp encodes given source sequence into a fixed-length vector, and then pass it as dense feature to generate target sequence.  
+Эта функция предназначена только для последовательности к последовательности. В задаче последовательности-последовательности RNNSharp кодирует заданную исходную последовательность в вектор фиксированной длины и затем передает ее как плотную функцию для генерации целевой последовательности. 
 
 ## Configuration File
 
-The configuration file describes model structure and features. In console tool, use -cfgfile as parameter to specify this file. Here is an example for sequence labeling task:  
+Файл конфигурации описывает структуру и функции модели. В консольном инструменте используйте параметр -cfgfile в качестве параметра для указания этого файла. Ниже приведен пример задачи по маркировке последовательностей:  
 
 \#Working directory. It is the parent directory of below relatived paths.  
 CURRENT_DIRECTORY = .  
@@ -180,12 +184,13 @@ AUTOENCODER_CONFIG = D:\RNNSharpDemoPackage\config_autoencoder.txt
   
 ## Training file format
 
-In training file, each sequence is represented as a features matrix and ends with an empty line. In the matrix, each row is for one token of the sequence and its features, and each column is for one feature type. In entire training corpus, the number of column must be fixed.
+В обучающем файле каждая последовательность представляется как матрица признаков и заканчивается пустой строкой. В матрице каждая строка предназначена для одного символа последовательности и ее функций, а каждый столбец предназначен для одного типа объектов. Во всем учебном корпусе число столбцов должно быть фиксированным.
 
-Sequence labeling task and sequence-to-sequence task have different training corpus format.  
+Задача маркировки последовательности и последовательность для последовательности задают разные форматы учебного корпуса. 
 
 ### Sequence labeling corpus  
-For sequence labeling tasks, the first N-1 columns are input features for training, and the Nth column (aka last column) is the answer of current token. Here is an example for named entity recognition task(The full training file is at release section, you can download it there): 
+
+Для задач маркировки последовательностей первые столбцы N-1 являются входными функциями для обучения, а N-й столбец (последний столбец) является ответом текущего токена. Вот пример для задачи распознавания имен по имени (полный учебный файл находится в разделе выпуска, вы можете скачать его там): 
 
 Word       | Pos  | Tag
 -----------|------|----
@@ -211,9 +216,10 @@ of         | IN   | M_ORGANIZATION
 Texas      | NNP  | M_ORGANIZATION
 Austin     | NNP  | E_ORGANIZATION
 
-It has two records splitted by blanket line. For each token, it has three columns. The first two columns are input feature set, which are word and pos-tag for the token. The third column is the ideal output of the model, which is named entity type for the token.  
 
-The named entity type looks like "Position_NamedEntityType". "Position" is the word position in the named entity, and "NamedEntityType" is the type of the entity. If "NamedEntityType" is empty, that means this is a common word, not a named entity. In this example, "Position" has four values:  
+Он имеет две записи, разделенные полосой. Для каждого токена он имеет три столбца. Первые два столбца - это набор функций ввода, которые являются словом и позиционным тегом для токена. Третий столбец является идеальным выходом модели, которая называется типом сущности для токена.
+
+Именованный тип объекта выглядит как «Position_NamedEntityType». «Позиция» - это позиция слова в названном объекте, а «NamedEntityType» - это тип объекта. Если «NamedEntityType» пуст, это означает, что это общее слово, а не именованный объект. В этом примере «Позиция» имеет четыре значения:  
  S : the single word of the named entity  
  B : the first word of the named entity  
  M : the word is in the middle of the named entity  
@@ -224,7 +230,8 @@ The named entity type looks like "Position_NamedEntityType". "Position" is the w
  LOCATION : the name of one location  
 
 ### Sequence-to-sequence corpus  
-For sequence-to-sequence task, the training corpus format is different. For each sequence pair, it has two sections, one is source sequence, the other is target sequence. Here is an example:  
+
+Для задачи seq2seq формат учебного корпуса отличается. Для каждой пары последовательностей она состоит из двух секций, одна из которых является исходной, другая - целевой. Вот пример:  
  
 Word      |  
 ----------| 
@@ -239,28 +246,30 @@ am        |
 Zhongkai  | 
 Fu        | 
 
-In above example, "What is your name ?" is the source sentence, and "I am Zhongkai Fu" is the target sentence generated by RNNSharp seq-to-seq model. In source sentence, beside word features, other feautes can also be applied for training, such as postag feature in sequence labeling task in above.  
+В приведенном выше примере: «Как тебя зовут?» является исходным предложением, а «Я - Zhongkai Fu» является целевым предложением, созданным моделью Seq-to-seq RNNSharp. В исходном предложении, помимо функций слова, другие функции могут также применяться для обучения, такие как функция postag в задаче последовательности, указанная выше. 
 
 
 ## Test file format
 
-Test file has the similar format as training file. For sequence labeling task, the only different between them is the last column. In test file, all columns are features for model decoding. For sequence-to-sequence task, it only contains source sequence. The target sentence will be generated by model.  
+Тестовый файл имеет такой же формат, как и файл тренировки. Для задачи маркировки последовательностей, единственная разница между ними - последний столбец. В тестовом файле все столбцы являются функциями для декодирования модели. Для задачи последовательности к последовательности она содержит только исходную последовательность. Целевое предложение будет сгенерировано моделью.  
 
 ## Tag (Output Vocabulary) File
 
-For sequence labeling task, this file contains output tag set. For sequence-to-sequence task, it's output vocabulary file.  
+Для задачи маркировки последовательностей этот файл содержит набор выходных тегов. Для задачи последовательности к последовательности это выходной лексический файл. 
 
 ## Console Tool
 
 ### RNNSharpConsole
 
-RNNSharpConsole.exe is a console tool for recurrent neural network encoding and decoding. The tool has two running modes. "train" mode is for model training and "test" mode is for output tag predicting from test corpus by given encoded model.
+RNNSharpConsole.exe - консольный инструмент для повторной кодировки и декодирования нейронной сети. Инструмент имеет два режима работы. Режим «train» предназначен для обучения модели, а режим «test» предназначен для прогнозирования выходного тега из тестового корпуса по заданной кодированной модели.
+
 
 ### Encode Model
 
-In this mode, the console tool can encode a RNN model by given feature set and training/validated corpus. The usage as follows:
 
-RNNSharpConsole.exe -mode train <parameters>  
+В этом режиме консольный инструмент может кодировать модель RNN с помощью заданного набора функций и обучения / проверенного корпуса. Использование:
+
+RNNSharpConsole.exe -mode train <параметры> 
  Parameters for training RNN based model.
 -trainfile <string>: Training corpus file  
 -validfile <string>: Validated corpus for training  
@@ -277,7 +286,8 @@ Example: RNNSharpConsole.exe -mode train -trainfile train.txt -validfile valid.t
 
 ### Decode Model
 
-In this mode, given test corpus file, RNNSharp predicts output tags in sequence labeling task or generates a target sequence in sequence-to-sequence task.  
+В этом режиме, при заданном тестовом корпусе, RNNSharp предсказывает выходные теги в задаче последовательности пометок или генерирует целевую последовательность в последовательности-последовательности.
+  
 
 RNNSharpConsole.exe -mode test <parameters>  
  Parameters for predicting iTagId tag from given corpus  
@@ -290,7 +300,8 @@ Example: RNNSharpConsole.exe -mode test -testfile test.txt -tagfile tags.txt -cf
 
 ## TFeatureBin
 
-It's used to generate template feature set by given template and corpus files. For high performance accessing and save memory cost, the indexed feature set is built as float array in trie-tree by AdvUtils. The tool supports three modes as follows:
+Он используется для создания набора шаблонов, заданных с помощью данного шаблона и файлов корпусов. Для высокопроизводительного доступа и экономии памяти индексный набор функций встроен в массив float в trie-tree от AdvUtils. Инструмент поддерживает три режима следующим образом:
+
 
 TFeatureBin.exe <parameters>  
  The tool is to generate template feature from corpus and index them into file  
@@ -301,7 +312,7 @@ TFeatureBin.exe <parameters>
 
 ### Build mode
 
-This mode is to extract features from given corpus according templates, and then build indexed feature set. The usage of this mode as follows：  
+Этот режим предназначен для извлечения функций из данного корпуса в соответствии с шаблонами, а затем для создания индексированного набора функций. Использование этого режима следующим образом:
 
 TFeatureBin.exe -mode build <parameters>  
  This mode is to extract feature from corpus and generate indexed feature set  
@@ -316,7 +327,7 @@ In above example, feature set is extracted from train.txt and build them into tf
 
 ### Extract mode
 
-This mode is only to extract features from given corpus and save them into a raw text file. The different between build mode and extract mode is that extract mode builds feature set as raw text format, not indexed binary format. The usage of extract mode as follows:  
+Этот режим предназначен только для извлечения функций из данного корпуса и сохранения их в исходный текстовый файл. Разница между режимом сборки и режимом извлечения заключается в том, что функция сборки режима экстракции устанавливается как формат необработанного текста, а не индексированный двоичный формат. Использование режима извлечения следующим образом:
 
 TFeatureBin.exe -mode extract <parameters>  
  This mode is to extract features from corpus and save them as text feature list  
@@ -327,7 +338,7 @@ TFeatureBin.exe -mode extract <parameters>
 
 Example: TFeatureBin.exe -mode extract -template template.txt -inputfile train.txt -ftrfile features.txt -minfreq 3  
 
-In above example, according templates, feature set is extracted from train.txt and save them into features.txt as raw text format. The format of output raw text file is "feature string \t frequency in corpus". Here is a few examples：  
+В приведенном выше примере, в соответствии с шаблонами, набор функций извлекается из train.txt и сохраняет их в feature.txt как формат необработанного текста. Формат выходного текстового файла - «строка функции \t частота в корпусе». Вот несколько примеров:
 
 U01:仲恺 \t 123  
 U01:仲文 \t 10  
@@ -337,7 +348,7 @@ U01:仲恺 is feature string and 123 is the frequency that this feature in corpu
 
 ### Index mode
 
-This mode is only to build indexed feature set by given templates and feature set in raw text format. The usage of this mode as follows：  
+Этот режим предназначен только для создания индексированной функции, заданной заданными шаблонами и набором функций в формате необработанного текста. Использование этого режима следующим образом:
 
 TFeatureBin.exe -mode index <parameters>  
  This mode is to build indexed feature set from raw text feature list  
@@ -347,10 +358,10 @@ TFeatureBin.exe -mode index <parameters>
 
 Example: TFeatureBin.exe -mode index -template template.txt -inputfile features.txt -ftrfile features.bin  
 
-In above example, according templates, the raw text feature set, features.txt, will be indexed as features.bin file in binary format.  
+В приведенном выше примере, согласно шаблонам, набор функций сырого текста, feature.txt, будет индексироваться как файл features.bin в двоичном формате.
 
 ## Performance
-Here is quality results on Chinese named entity recognizer task. Corpus, configuration and parameter files are available in RNNSharp demo package file at [release section](https://github.com/zhongkaifu/RNNSharp/releases). The result is based on bi-directional model. The first hidden layer size is 200, and the second hidden layer size is 100. Here are test results:  
+Вот качественные результаты по китайской задаче распознавания сущностей. Файлы корпуса, конфигурации и параметров доступны в файле демонстрационного пакета RNNSharp в разделе [release] (https://github.com/zhongkaifu/RNNSharp/releases). Результат основан на двунаправленной модели. Первый скрытый размер слоя - 200, а второй размер скрытого слоя - 100. Вот результаты теста:
 
 Parameter               | Token Error  | Sentence Error
 ------------------------|--------------|----
@@ -361,11 +372,11 @@ Parameter               | Token Error  | Sentence Error
 
 ## Run on Linux/Mac
 
-RNNSharp is a pure C# project, so it can be compiled by .NET Core and Mono, and runns without modification on Linux/Mac.  
+RNNSharp - это чистый проект C #, поэтому он может быть скомпилирован .NET Core и Mono и без изменений в Linux / Mac.
 
 ## APIs
 
-The RNNSharp also provides some APIs for developers to leverage it into their projects. By download source code package and open RNNSharpConsole project, you will see how to use APIs in your project to encode and decode RNN models. Note that, before use RNNSharp APIs, you should add RNNSharp.dll as reference into your project.  
+RNNSharp также предоставляет некоторые API для разработчиков, чтобы использовать его в своих проектах. Загрузив исходный пакет кода и откройте проект RNNSharpConsole, вы увидите, как использовать API в своем проекте для кодирования и декодирования моделей RNN. Обратите внимание, что перед использованием API RNNSharp вы должны добавить RNNSharp.dll в качестве ссылки в свой проект.
 
 ## RNNSharp referenced by the following published papers  
 1. [Project-Team IntuiDoc: Intuitive user interaction for document](https://www.irisa.fr/intuidoc/data/ra/intuidoc2015.pdf)
